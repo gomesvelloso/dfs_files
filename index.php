@@ -1,44 +1,44 @@
 <?php
-$listagem  = listagem("imagens/", 'Diretorio');
-$impressao = impressao($listagem);
-echo'<pre>';print_r($impressao);exit;
+$list  = listAll("images/", 'Dir');
+$print = printAll($list);
+echo'<pre>';print_r($print);exit;
 
-function impressao($listagem)
+function printAll($list)
 {
 	global $data;
-	$listagem = json_decode($listagem, true);
-	foreach($listagem as $diretorio){
-		$nomeDiretorio = $diretorio["diretorio"];
+	$list = json_decode($list, true);
+	foreach($list as $dir){
+		$nomeDiretorio = $dir["dir"];
 		
-		if(!empty(($diretorio["arquivos"]))){
-			$data[$nomeDiretorio] = $diretorio["arquivos"];
+		if(!empty(($dir["files"]))){
+			$data[$nomeDiretorio] = $dir["files"];
 		}
 		
-		foreach($diretorio["subdiretorios"] as $sub){
+		foreach($dir["sub"] as $sub){
 			if(!empty($sub)){
-				impressao($sub, "sub");
+				printAll($sub);
 			}
 		}
 	}
 	return $data;
 }
 
-function listagem($diretorio, $type)
+function listAll($dir, $type)
 {   
-    $path  = $diretorio;
+    $path  = $dir;
     $files = scandir($path);
 	$dados = array(
-		"diretorio" => $path,
-		"subdiretorios" => array(),
-		"arquivos" => array()
+		"dir" => $path,
+		"sub" => array(),
+		"files" => array()
 	);
 	
     for($i = 2; $i< count($files); $i++){
         
         if(is_dir($path.$files[$i])){
-            $dados["subdiretorios"][] = listagem($path.$files[$i].'/','Subdiretorio');
+            $dados["sub"][] = listAll($path.$files[$i].'/','Sub');
         }else{
-			$dados["arquivos"][] = $path.$files[$i];
+			$dados["files"][] = $path.$files[$i];
 		}       
     }
 	return json_encode(array($dados));
